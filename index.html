@@ -3,57 +3,120 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Random Number Generator</title>
+    <title>Stake Crash App Predict</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             text-align: center;
             margin-top: 50px;
         }
-        .number {
-            font-size: 48px;
+        h1 {
             color: #333;
-            margin: 20px 0;
+        }
+        .predictions {
+            margin-top: 20px;
+        }
+        .prediction {
+            font-size: 24px;
+            color: #444;
+            margin: 10px 0;
         }
         .timer {
-            font-size: 24px;
-            color: #555;
+            font-size: 20px;
+            color: #777;
+            margin-top: 30px;
         }
     </style>
 </head>
 <body>
-    <h1>Random Number Generator</h1>
-    <div class="number" id="randomNumber">5</div>
-    <div class="timer" id="timer">Next update in: 15:00</div>
+    <h1>Stake Crash App Predict</h1>
+    <div class="predictions" id="predictions"></div>
+    <div class="timer" id="timer">Next update in: 30:00</div>
 
     <script>
-        const randomNumberElement = document.getElementById('randomNumber');
+        const predictionsElement = document.getElementById('predictions');
         const timerElement = document.getElementById('timer');
+        const interval = 1800; // 30 minutes in seconds
+        let timeLeft = interval;
 
-        let timeLeft = 900; // 15 minutes in seconds
+        // Function to generate predictions
+        function generatePredictions() {
+            const now = new Date();
+            const predictions = [];
 
-        // Function to generate a random number between 5 and 100
-        function generateRandomNumber() {
-            const randomNumber = Math.floor(Math.random() * (100 - 5 + 1)) + 5;
-            randomNumberElement.textContent = randomNumber;
+            for (let i = 0; i < 3; i++) {
+                const futureTime = new Date(now.getTime() + (4 * 60 * 60 * 1000) + (i * 30 * 60 * 1000)); // 4 hours offset + 30 mins increments
+                const timeString = futureTime.toTimeString().slice(0, 5); // Format time as HH:MM
+                const predictionValue = (Math.random() * (15 - 1) + 1).toFixed(1) + "x"; // Random number between 1x and 15x
+                predictions.push({ time: timeString, value: predictionValue });
+            }
+
+            return predictions;
         }
 
-        // Function to update the timer every second
+        // Function to save predictions in localStorage
+        function savePredictions(predictions) {
+            localStorage.setItem('predictions', JSON.stringify(predictions));
+            localStorage.setItem('lastUpdated', Date.now());
+        }
+
+        // Function to load predictions from localStorage
+        function loadPredictions() {
+            const storedPredictions = localStorage.getItem('predictions');
+            return storedPredictions ? JSON.parse(storedPredictions) : null;
+        }
+
+        // Function to check if predictions need an update
+        function needsUpdate() {
+            const lastUpdated = localStorage.getItem('lastUpdated');
+            if (!lastUpdated) return true;
+
+            const elapsed = (Date.now() - lastUpdated) / 1000; // Time elapsed in seconds
+            return elapsed >= interval;
+        }
+
+        // Function to display predictions
+        function displayPredictions(predictions) {
+            predictionsElement.innerHTML = '';
+            predictions.forEach(prediction => {
+                const predictionElement = document.createElement('div');
+                predictionElement.className = 'prediction';
+                predictionElement.textContent = `${prediction.time} :: ${prediction.value}`;
+                predictionsElement.appendChild(predictionElement);
+            });
+        }
+
+        // Function to update the timer
         function updateTimer() {
             const minutes = Math.floor(timeLeft / 60);
             const seconds = timeLeft % 60;
             timerElement.textContent = `Next update in: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
             if (timeLeft > 0) {
                 timeLeft--;
             } else {
-                timeLeft = 900; // Reset timer
-                generateRandomNumber();
+                timeLeft = interval; // Reset timer
+                const newPredictions = generatePredictions();
+                savePredictions(newPredictions);
+                displayPredictions(newPredictions);
             }
         }
 
-        // Initialize
-        generateRandomNumber();
-        setInterval(updateTimer, 1000); // Update the timer every second
+        // Initialize the application
+        function init() {
+            let predictions;
+            if (needsUpdate()) {
+                predictions = generatePredictions();
+                savePredictions(predictions);
+            } else {
+                predictions = loadPredictions();
+            }
+
+            displayPredictions(predictions);
+            setInterval(updateTimer, 1000); // Update the timer every second
+        }
+
+        init();
     </script>
 </body>
 </html>
