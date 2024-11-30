@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Number Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        .number {
+            font-size: 48px;
+            color: #333;
+            margin: 20px 0;
+        }
+        .timer {
+            font-size: 24px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <h1>Random Number Generator</h1>
+    <div class="number" id="randomNumber">5</div>
+    <div class="timer" id="timer">Next update in: 15:00</div>
+
+    <script>
+        const randomNumberElement = document.getElementById('randomNumber');
+        const timerElement = document.getElementById('timer');
+
+        let timeLeft = 900; // 15 minutes in seconds
+
+        // Function to generate a random number between 5 and 100
+        function generateRandomNumber() {
+            const randomNumber = Math.floor(Math.random() * (100 - 5 + 1)) + 5;
+            randomNumberElement.textContent = randomNumber;
+        }
+
+        // Function to update the timer every second
+        function updateTimer() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            timerElement.textContent = `Next update in: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            if (timeLeft > 0) {
+                timeLeft--;
+            } else {
+                timeLeft = 900; // Reset timer
+                generateRandomNumber();
+            }
+        }
+
+        // Initialize
+        generateRandomNumber();
+        setInterval(updateTimer, 1000); // Update the timer every second
+    </script>
+</body>
+</html>
