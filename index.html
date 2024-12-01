@@ -9,6 +9,7 @@
             font-family: Arial, sans-serif;
             text-align: center;
             margin-top: 50px;
+            display: none; /* Initially hide content until password is verified */
         }
         h1 {
             color: #333;
@@ -30,10 +31,27 @@
 </head>
 <body>
     <h1>Stake Crash App Predict</h1>
+    <h4>User : naresh1889</h4>
     <div class="predictions" id="predictions"></div>
     <div class="timer" id="timer">Next update in: 30:00</div>
 
     <script>
+        // Password protection
+        const correctPassword = "naresh1889"; // Set your password here
+        function requestPassword() {
+            const enteredPassword = prompt("Enter the password to access the site:");
+            if (enteredPassword === correctPassword) {
+                document.body.style.display = "block"; // Show the content
+            } else {
+                alert("Incorrect password. Reload the page to try again.");
+                document.body.innerHTML = ""; // Clear content if password is wrong
+            }
+        }
+
+        // Call the password function on load
+        window.onload = requestPassword;
+
+        // Prediction Timer and Logic
         const predictionsElement = document.getElementById('predictions');
         const timerElement = document.getElementById('timer');
         const interval = 1800; // 30 minutes in seconds
@@ -81,7 +99,7 @@
             predictions.forEach(prediction => {
                 const predictionElement = document.createElement('div');
                 predictionElement.className = 'prediction';
-                predictionElement.textContent = `${prediction.time} :: ${prediction.value}`;
+                predictionElement.textContent = `Second Bet` +" "+ ` ${prediction.time} :: ${prediction.value}`;
                 predictionsElement.appendChild(predictionElement);
             });
         }
@@ -116,7 +134,13 @@
             setInterval(updateTimer, 1000); // Update the timer every second
         }
 
-        init();
+        // Initialize after password verification
+        window.onload = function () {
+            requestPassword();
+            if (document.body.style.display === "block") {
+                init();
+            }
+        };
     </script>
 </body>
 </html>
